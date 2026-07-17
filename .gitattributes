@@ -1,0 +1,8 @@
+# Normalize line endings across platforms
+* text=auto
+
+# Windows scripts keep CRLF
+*.bat text eol=crlf
+
+# Shell scripts keep LF
+*.sh text eol=lf

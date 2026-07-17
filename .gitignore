@@ -1,0 +1,38 @@
+# ── Secrets — NEVER COMMIT ────────────────────────────────────
+.env
+*.env
+!.env.template
+secrets.json
+*.pem
+*.key
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# ── Logs & runtime ────────────────────────────────────────────
+*.log
+logs/
+nssm.exe
+nssm.zip
+deploy.zip
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
