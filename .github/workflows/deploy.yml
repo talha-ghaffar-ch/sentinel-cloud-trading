@@ -1,0 +1,35 @@
+name: Deploy to AWS Elastic Beanstalk
+
+# Deploys the Flask web platform to Elastic Beanstalk on every push to main.
+# Requires the repository secrets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY,
+# and an existing EB application/environment matching the values below.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web_platform/**"
+      - ".github/workflows/deploy.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create deployment package
+        working-directory: web_platform
+        run: |
+          zip -r ../deploy.zip . \
+            -x "*.git*" "*.env" "__pycache__/*" "*.pyc" "*.bat" "logs/*"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key:     ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name:   sentinel-web
+          environment_name:   sentinel-web-prod
+          version_label:      ${{ github.sha }}
+          region:             ap-south-1
+          deployment_package: deploy.zip
