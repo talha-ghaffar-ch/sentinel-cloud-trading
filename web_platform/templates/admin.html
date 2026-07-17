@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}ADMIN PANEL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>⬟ Admin Panel</h1><p>Application review and user management</p></div>
+</div>
+
+<!-- SUMMARY TILES -->
+<div class="grid-4 mb-24">
+  <div class="stat-tile yellow">
+    <div class="stat-label">Pending Review</div>
+    <div class="stat-value yellow">{{ counts.pending }}</div>
+  </div>
+  <div class="stat-tile cyan">
+    <div class="stat-label">Under Review</div>
+    <div class="stat-value cyan">{{ counts.under_review }}</div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">Verified Users</div>
+    <div class="stat-value green">{{ counts.verified }}</div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">Total Accounts</div>
+    <div class="stat-value">{{ counts.total_users }}</div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div style="display:flex;gap:8px;margin-bottom:16px;">
+  <a href="{{ url_for('admin_panel') }}" class="btn btn-sm {{ 'btn-green' if not status_filter else 'btn-outline' }}">ALL</a>
+  <a href="{{ url_for('admin_panel', status='pending') }}"      class="btn btn-sm {{ 'btn-green' if status_filter=='pending'      else 'btn-outline' }}">PENDING</a>
+  <a href="{{ url_for('admin_panel', status='under_review') }}" class="btn btn-sm {{ 'btn-green' if status_filter=='under_review' else 'btn-outline' }}">UNDER REVIEW</a>
+  <a href="{{ url_for('admin_panel', status='verified') }}"     class="btn btn-sm {{ 'btn-green' if status_filter=='verified'     else 'btn-outline' }}">VERIFIED</a>
+  <a href="{{ url_for('admin_panel', status='rejected') }}"     class="btn btn-sm {{ 'btn-green' if status_filter=='rejected'     else 'btn-outline' }}">REJECTED</a>
+</div>
+
+<!-- APPLICATIONS TABLE -->
+<div class="card mb-24">
+  <div class="card-header">Service Applications</div>
+  {% if not applications %}
+    <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;font-family:var(--font-mono);">
+      NO APPLICATIONS{{ ' WITH STATUS: ' + status_filter.upper() if status_filter else '' }}
+    </div>
+  {% else %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>MT5 Server</th><th>Submitted</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td>{{ app.full_name }}</td>
+          <td class="text-mono">{{ app.email }}</td>
+          <td class="text-mono">{{ app.mt5_server or '—' }}</td>
+          <td class="text-mono">{{ app.submitted_at.strftime('%Y-%m-%d %H:%M') if app.submitted_at else '—' }}</td>
+          <td><span class="status-badge {{ app.status }}">{{ app.status | upper | replace('_', ' ') }}</span></td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center;">
+              {% if app.status in ('pending', 'under_review') %}
+                <!-- Approve -->
+                <form method="POST" action="{{ url_for('admin_approve', application_id=app.application_id) }}" style="display:inline;">
+                  <button type="submit" class="btn btn-green btn-sm"
+                    onclick="return confirm('Approve this application and give {{ app.full_name }} terminal access?')">
+                    APPROVE
+                  </button>
+                </form>
+                <!-- Reject modal trigger -->
+                <button class="btn btn-red btn-sm"
+                  onclick="showRejectForm('{{ app.application_id }}')">REJECT</button>
+              {% elif app.status == 'verified' %}
+                <span style="color:var(--text-muted);font-size:11px;font-family:var(--font-mono);">Active</span>
+              {% elif app.status == 'rejected' %}
+                <span style="color:var(--text-muted);font-size:11px;" title="{{ app.rejection_reason }}">Rejected</span>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        <!-- Inline reject form (hidden by default) -->
+        <tr id="reject-row-{{ app.application_id }}" style="display:none;background:var(--bg-hover);">
+          <td colspan="6">
+            <form method="POST" action="{{ url_for('admin_reject', application_id=app.application_id) }}"
+                  style="display:flex;gap:10px;align-items:center;padding:8px 0;">
+              <input type="text" name="rejection_reason" class="form-control" style="flex:1;"
+                     placeholder="Rejection reason..." required>
+              <button type="submit" class="btn btn-red btn-sm">CONFIRM REJECT</button>
+              <button type="button" class="btn btn-outline btn-sm"
+                      onclick="document.getElementById('reject-row-{{ app.application_id }}').style.display='none'">CANCEL</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+<!-- USERS TABLE -->
+<div class="card">
+  <div class="card-header">All Users</div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>User ID</th><th>Status</th><th>Trades</th><th>P&L</th><th>Joined</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.full_name or '—' }}</td>
+          <td class="text-mono">{{ u.email }}</td>
+          <td class="text-mono text-dim">{{ u.user_id }}</td>
+          <td><span class="status-badge {{ u.account_status }}">{{ u.account_status | upper }}</span></td>
+          <td>{{ u.trade_count or 0 }}</td>
+          <td class="{{ 'text-green' if (u.total_profit or 0) >= 0 else 'text-red' }}">
+            {{ '+' if (u.total_profit or 0) >= 0 else '' }}${{ "%.2f"|format(u.total_profit or 0) }}
+          </td>
+          <td class="text-mono">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '—' }}</td>
+          <td>
+            {% if u.account_status != 'suspended' and u.account_status != 'banned' %}
+            <form method="POST" action="{{ url_for('admin_suspend_user', user_id=u.user_id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-red btn-sm"
+                onclick="return confirm('Suspend {{ u.email }}?')">SUSPEND</button>
+            </form>
+            {% else %}
+            <span style="color:var(--text-muted);font-size:11px;">Suspended</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function showRejectForm(appId) {
+  const row = document.getElementById('reject-row-' + appId);
+  if (row) row.style.display = '';
+}
+</script>
+{% endblock %}

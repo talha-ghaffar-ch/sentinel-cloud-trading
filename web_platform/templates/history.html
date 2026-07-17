@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}TRADE HISTORY{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Trade History</h1><p>Complete trade ledger from RDS PostgreSQL</p></div>
+  <a href="{{ url_for('terminal') }}" class="btn btn-outline">← TERMINAL</a>
+</div>
+
+<div class="grid-4 mb-24">
+  <div class="stat-tile">
+    <div class="stat-label">Total Trades</div>
+    <div class="stat-value">{{ stats.total_trades or 0 }}</div>
+  </div>
+  <div class="stat-tile {{ 'green' if (stats.total_profit or 0) >= 0 else 'red' }}">
+    <div class="stat-label">Total Profit</div>
+    <div class="stat-value {{ 'green' if (stats.total_profit or 0) >= 0 else 'red' }}">
+      {{ '+' if (stats.total_profit or 0) >= 0 else '' }}${{ "%.2f"|format(stats.total_profit or 0) }}
+    </div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">Win Rate</div>
+    <div class="stat-value">
+      {% if stats.total_trades %}{{ "%.1f"|format(stats.wins/stats.total_trades*100) }}%{% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="stat-tile cyan">
+    <div class="stat-label">Avg AI Confidence</div>
+    <div class="stat-value cyan">{{ "%.1f"|format(stats.avg_confidence or 0) }}%</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">All Trades</div>
+  {% if not trades %}
+    <div style="text-align:center;padding:40px;color:var(--text-muted);font-family:var(--font-mono);font-size:13px;">
+      NO TRADES RECORDED YET
+    </div>
+  {% else %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket</th><th>Type</th><th>Lot</th>
+          <th>Open</th><th>Close</th><th>Duration</th>
+          <th>Open $</th><th>Close $</th>
+          <th>P&L</th><th>AI Conf</th><th>DD%</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in trades %}
+        <tr>
+          <td>{{ t.deal_ticket }}</td>
+          <td class="{{ 'text-green' if t.trade_type == 'LONG' else 'text-red' }}">{{ t.trade_type }}</td>
+          <td>{{ t.lot_size }}</td>
+          <td>{{ t.open_time.strftime('%m-%d %H:%M') if t.open_time else '—' }}</td>
+          <td>{{ t.close_time.strftime('%m-%d %H:%M') if t.close_time else '—' }}</td>
+          <td>{{ t.duration_interval or '—' }}</td>
+          <td class="text-mono">{{ "%.5f"|format(t.open_price) }}</td>
+          <td class="text-mono">{{ "%.5f"|format(t.close_price) }}</td>
+          <td class="{{ 'text-green' if t.profit_usd >= 0 else 'text-red' }}" style="font-weight:700;">
+            {{ '+' if t.profit_usd >= 0 else '' }}${{ "%.2f"|format(t.profit_usd) }}
+          </td>
+          <td>{{ "%.1f"|format((t.ai_confidence_score or 0)*100) }}%</td>
+          <td class="{{ 'text-red' if (t.drawdown_at_execution or 0) > 5 else 'text-dim' }}">
+            {{ "%.1f"|format(t.drawdown_at_execution or 0) }}%
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

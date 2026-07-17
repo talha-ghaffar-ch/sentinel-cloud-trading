@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}APPLY{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Service Application</h1>
+    <p>Complete all fields to request access to the automated trading terminal.</p>
+  </div>
+</div>
+
+<div style="max-width:720px;">
+  <form method="POST">
+    <div class="card mb-16">
+      <div class="card-header">Personal Information</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="full_name" class="form-control" value="{{ full_name or session.full_name }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone_number" class="form-control" value="{{ phone_number or '' }}" placeholder="+1 555 000 0000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Residential Address</label>
+        <textarea name="address" class="form-control" rows="2" placeholder="Street, City, Country">{{ address or '' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source of Income</label>
+        <input type="text" name="income_source" class="form-control" value="{{ income_source or '' }}" placeholder="e.g. Employment, Business, Investments">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason for Using This Service *</label>
+        <textarea name="reason_for_use" class="form-control" rows="3" required placeholder="Describe your trading experience and why you want to use this service...">{{ reason_for_use or '' }}</textarea>
+      </div>
+    </div>
+
+    <div class="card mb-16">
+      <div class="card-header">MT5 Terminal Credentials</div>
+      <p style="color:var(--text-dim);font-size:12px;margin-bottom:18px;font-family:var(--font-mono);">
+        ▸ These credentials will be used to set up your dedicated trading terminal on our servers.<br>
+        ▸ Your password is stored securely and never displayed in plain text after submission.
+      </p>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">MT5 Account Login *</label>
+          <input type="text" name="mt5_login" class="form-control text-mono" value="{{ mt5_login or '' }}" placeholder="12345678" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MT5 Password *</label>
+          <input type="password" name="mt5_password" class="form-control" placeholder="Your MT5 password" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">MT5 Server *</label>
+        <input type="text" name="mt5_server" class="form-control text-mono" value="{{ mt5_server or '' }}" placeholder="e.g. MetaQuotes-Demo or BrokerName-Live" required>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-header">Terms & Conditions</div>
+      <p style="color:var(--text-dim);font-size:12px;line-height:1.8;margin-bottom:18px;font-family:var(--font-mono);">
+        By submitting this application you acknowledge that:<br>
+        ▸ Automated trading involves significant financial risk including total loss of capital.<br>
+        ▸ Past performance does not guarantee future results.<br>
+        ▸ You are solely responsible for all trading decisions and outcomes.<br>
+        ▸ Your personal data will be processed in accordance with our Privacy Policy.<br>
+        ▸ You are of legal age and authorized to trade in your jurisdiction.
+      </p>
+      <label class="form-check">
+        <input type="checkbox" name="terms_accepted" required>
+        <span class="form-check-label">I have read and accept the Terms and Conditions and understand the risks involved in automated trading.</span>
+      </label>
+    </div>
+
+    <div class="flex gap-12">
+      <button type="submit" class="btn btn-green btn-lg">SUBMIT APPLICATION</button>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-lg">CANCEL</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}TERMINAL{% endblock %}
+{% block head %}
+<style>
+  .main-content { padding: 16px 24px; max-width: 100%; }
+  body { background-image: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,230,118,0.015) 2px,rgba(0,230,118,0.015) 4px); }
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- TERMINAL HEADER BAR -->
+<div class="terminal-header mb-16" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;align-items:center;gap:24px;">
+    <div class="asset-name">XAU/USD</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">
+      BID <span id="val-bid" class="red" style="font-size:16px;color:var(--red);">—</span>
+      &nbsp;/&nbsp;
+      ASK <span id="val-ask" class="green" style="font-size:16px;color:var(--green);">—</span>
+      &nbsp;&nbsp;SPD <span id="val-spread">—</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;font-size:11px;font-family:var(--font-mono);">
+    <span><span class="conn-dot offline" id="conn-dot"></span><span id="conn-label">CONNECTING</span></span>
+    <span style="color:var(--text-muted);">{{ full_name | upper }} &nbsp;·&nbsp; {{ user_id }}</span>
+  </div>
+</div>
+
+<div class="terminal-grid">
+
+  <!-- LEFT COLUMN: System Status + Risk -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="card">
+      <div class="card-header">System Status</div>
+      <div class="metric-row">
+        <div class="metric-item"><span class="metric-key">STATUS</span><span class="metric-val" id="val-status">—</span></div>
+        <div class="metric-item"><span class="metric-key">MODE</span><span class="metric-val" id="val-mode">—</span></div>
+        <div class="metric-item"><span class="metric-key">POSITION</span><span class="metric-val" id="val-position">—</span></div>
+        <div class="metric-item"><span class="metric-key">OPEN TRADES</span><span class="metric-val" id="val-active-trades">—</span></div>
+        <div class="metric-item"><span class="metric-key">COOLDOWN</span><span class="metric-val" id="val-cooldown">—</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Risk Monitor</div>
+      <div style="margin-bottom:8px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">DRAWDOWN</div>
+      <div class="progress-bar-wrapper"><div class="progress-bar-fill" id="drawdown-bar" style="width:0%"></div></div>
+      <div class="metric-row">
+        <div class="metric-item"><span class="metric-key">DRAWDOWN %</span><span class="metric-val" id="val-drawdown">—</span></div>
+        <div class="metric-item"><span class="metric-key">SESSION P&L</span><span class="metric-val" id="val-pnl">—</span></div>
+        <div class="metric-item"><span class="metric-key">OPEN P&L</span><span class="metric-val" id="val-open-pnl">—</span></div>
+        <div class="metric-item"><span class="metric-key">BALANCE</span><span class="metric-val" id="val-balance">—</span></div>
+        <div class="metric-item"><span class="metric-key">EQUITY</span><span class="metric-val" id="val-equity">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: AI Scanner + Trade History -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="card">
+      <div class="card-header">AI Signal Scanner</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span id="val-signal" class="signal-badge WAIT">WAIT</span>
+        <div style="text-align:right;font-family:var(--font-mono);font-size:12px;">
+          <div style="color:var(--text-muted);font-size:10px;letter-spacing:1px;">CONFIDENCE</div>
+          <div id="val-confidence" style="font-size:18px;font-weight:700;">—</div>
+        </div>
+      </div>
+      <div class="grid-2" style="gap:8px;">
+        <div class="metric-item"><span class="metric-key">TREND</span><span class="metric-val" id="val-trend">—</span></div>
+        <div class="metric-item"><span class="metric-key">MACD</span><span class="metric-val" id="val-macd">—</span></div>
+        <div class="metric-item"><span class="metric-key">RSI</span><span class="metric-val" id="val-rsi">—</span></div>
+        <div class="metric-item"><span class="metric-key">WIN RATE</span><span class="metric-val" id="val-winrate">—</span></div>
+        <div class="metric-item"><span class="metric-key">TOTAL TRADES</span><span class="metric-val" id="val-trades">—</span></div>
+        <div class="metric-item">
+          <span class="metric-key">W/L</span>
+          <span><span id="val-wins" class="metric-val green">0</span> / <span id="val-losses" class="metric-val red">0</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="flex:1;">
+      <div class="card-header">Session Trade History</div>
+      <div id="trade-history-panel" style="overflow-y:auto;max-height:220px;">
+        <div style="color:var(--text-muted);text-align:center;padding:24px;font-size:11px;">AWAITING DATA...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">System Logs</div>
+      <div class="log-panel" id="log-panel">Connecting to node...</div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: Controls -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="card">
+      <div class="card-header">Auto-Trade Control</div>
+      <button id="btn-toggle-trade" class="btn btn-green btn-full" style="margin-bottom:8px;">ARM SYSTEM</button>
+      <button id="btn-toggle-cb" class="btn btn-outline btn-sm btn-full">CB: ARMED</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Manual Commands</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button id="btn-close-all" class="btn btn-outline btn-full">CLOSE ALL POSITIONS</button>
+        <button id="btn-bypass-cooldown" class="btn btn-outline btn-full">BYPASS COOLDOWN</button>
+        <button id="btn-emergency-stop" class="btn btn-red btn-full" style="margin-top:8px;">
+          ⚠ EMERGENCY STOP
+        </button>
+      </div>
+    </div>
+
+    <!-- CB Reboot (hidden until tripped) -->
+    <div id="reboot-section" class="card" style="display:none;border-color:var(--cyan);">
+      <div class="card-header" style="color:var(--cyan);">Circuit Breaker Tripped</div>
+      <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px;font-family:var(--font-mono);">
+        Max drawdown limit reached. All trading halted. Reboot to reset peak balance and re-enable.
+      </p>
+      <button id="btn-reboot-cb" class="btn btn-cyan btn-full">REBOOT SYSTEM</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Performance</div>
+      <div class="metric-row">
+        <div class="metric-item"><span class="metric-key">WINS</span><span class="metric-val green" id="val-wins-2">—</span></div>
+        <div class="metric-item"><span class="metric-key">LOSSES</span><span class="metric-val red" id="val-losses-2">—</span></div>
+      </div>
+      <a href="{{ url_for('history') }}" class="btn btn-outline btn-full btn-sm mt-16">FULL HISTORY →</a>
+    </div>
+  </div>
+
+</div><!-- /terminal-grid -->
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/terminal.js') }}"></script>
+{% endblock %}

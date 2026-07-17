@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}DASHBOARD{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="text-mono">{{ session.email }} &nbsp;·&nbsp; ID: {{ session.user_id }}</p>
+  </div>
+  {% if session.account_status == 'verified' %}
+    <a href="{{ url_for('terminal') }}" class="btn btn-green">OPEN TERMINAL →</a>
+  {% endif %}
+</div>
+
+<!-- STATUS TILES -->
+<div class="grid-4 mb-24">
+  <div class="stat-tile">
+    <div class="stat-label">Account Status</div>
+    <div class="stat-value {{ 'green' if session.account_status == 'verified' else 'yellow' }}">
+      {{ session.account_status | upper }}
+    </div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">Total Trades</div>
+    <div class="stat-value">{{ stats.total_trades or 0 }}</div>
+  </div>
+  <div class="stat-tile {{ 'green' if (stats.total_profit or 0) >= 0 else 'red' }}">
+    <div class="stat-label">Total Profit</div>
+    <div class="stat-value {{ 'green' if (stats.total_profit or 0) >= 0 else 'red' }}">
+      {{ '+' if (stats.total_profit or 0) >= 0 else '' }}${{ "%.2f" | format(stats.total_profit or 0) }}
+    </div>
+  </div>
+  <div class="stat-tile">
+    <div class="stat-label">Win Rate</div>
+    <div class="stat-value">
+      {% if stats.total_trades %}
+        {{ "%.1f" | format((stats.wins / stats.total_trades * 100) if stats.total_trades else 0) }}%
+      {% else %}—{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- APPLICATION STATUS -->
+  <div class="card">
+    <div class="card-header">Service Application</div>
+    {% if not application %}
+      <p style="color:var(--text-dim);margin-bottom:18px;font-size:13px;line-height:1.6;">
+        To access the automated trading terminal, you must submit a service application.
+        After review, your account will be activated within 24–48 hours.
+      </p>
+      <a href="{{ url_for('apply') }}" class="btn btn-green">SUBMIT APPLICATION →</a>
+    {% else %}
+      <div class="metric-row">
+        <div class="metric-item">
+          <span class="metric-key">STATUS</span>
+          <span class="status-badge {{ application.status }}">{{ application.status | upper | replace('_', ' ') }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-key">SUBMITTED</span>
+          <span class="metric-val">{{ application.submitted_at.strftime('%Y-%m-%d') if application.submitted_at else '—' }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-key">MT5 SERVER</span>
+          <span class="metric-val">{{ application.mt5_server or '—' }}</span>
+        </div>
+        {% if application.status == 'rejected' %}
+        <div class="metric-item">
+          <span class="metric-key">REASON</span>
+          <span class="metric-val text-red">{{ application.rejection_reason or '—' }}</span>
+        </div>
+        <a href="{{ url_for('apply') }}" class="btn btn-outline mt-16">RE-APPLY</a>
+        {% elif application.status == 'pending' %}
+        <p style="color:var(--text-muted);font-size:12px;font-family:var(--font-mono);margin-top:12px;">
+          Your application is under review. You will be notified once approved.
+        </p>
+        {% elif application.status == 'verified' %}
+        <a href="{{ url_for('terminal') }}" class="btn btn-green mt-16">OPEN TERMINAL →</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- QUICK STATS -->
+  <div class="card">
+    <div class="card-header">Trading Overview</div>
+    <div class="metric-row">
+      <div class="metric-item">
+        <span class="metric-key">WINS</span>
+        <span class="metric-val green">{{ stats.wins or 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-key">LOSSES</span>
+        <span class="metric-val red">{{ stats.losses or 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-key">AVG AI CONFIDENCE</span>
+        <span class="metric-val">{{ "%.1f" | format((stats.avg_confidence or 0)) }}%</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-key">ACCOUNT ID</span>
+        <span class="metric-val text-mono">{{ session.user_id }}</span>
+      </div>
+    </div>
+    {% if session.account_status == 'verified' %}
+    <a href="{{ url_for('history') }}" class="btn btn-outline mt-16 btn-full">VIEW FULL HISTORY</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
