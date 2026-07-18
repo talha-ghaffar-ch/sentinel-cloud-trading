@@ -49,6 +49,10 @@ Real-time terminal — AI signal, confidence, live P&L, drawdown monitor, risk c
 
 ![Trading terminal](docs/screenshots/terminal.png)
 
+**Automated risk & safety** — when drawdown breaches the configured limit, the circuit breaker halts trading, force-closes open positions, and locks the terminal until the operator reboots it:
+
+![Circuit breaker tripped](docs/screenshots/terminal-circuit-breaker.png)
+
 ### Dashboard &nbsp;·&nbsp; Admin Panel
 | User Dashboard | Admin Panel |
 |:---:|:---:|
