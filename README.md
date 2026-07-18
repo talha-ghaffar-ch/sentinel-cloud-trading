@@ -7,7 +7,7 @@
 ![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![DynamoDB](https://img.shields.io/badge/DynamoDB-Real--time-4053D6?style=for-the-badge&logo=amazon-dynamodb&logoColor=white)
-![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **A cloud-hosted, AI-powered automated trading platform with multi-user management, real-time dashboards, and full AWS infrastructure.**
 
@@ -18,14 +18,14 @@
 ---
 
 > ### 🔒 A note on what's in this repository
-> This is a full source-available portfolio repository — web platform, trading
+> This is a full, open-source (MIT) portfolio repository — web platform, trading
 > engine, database schema, infrastructure scripts, and complete documentation.
 > The only things deliberately **withheld** are the production-tuned strategy
 > parameters (signal-confidence gates, recovery position-sizing, and stop/target
 > multipliers). Those live behind environment variables; the in-code defaults are
 > neutral placeholders. No credentials, keys, or secrets are stored anywhere in
 > this repository — all runtime configuration is injected via environment
-> variables. See the [LICENSE](LICENSE) for usage terms.
+> variables. Licensed under the [MIT License](LICENSE).
 
 ---
 
@@ -33,7 +33,7 @@
 
 **Sentinel Cloud Trading** is a full-stack, cloud-deployed platform that enables clients to run automated forex/gold trading through MetaTrader 5 terminals managed entirely on AWS infrastructure. The platform provides a secure web interface where users register, submit KYC applications, and — once verified — access a real-time trading terminal that displays live market data, AI-generated signals, and full trade execution control.
 
-The system was designed and built end-to-end as a **final-year project**, covering backend web development, cloud infrastructure, database architecture, real-time data pipelines, AI/ML integration, and automated deployment.
+The system was designed and built end-to-end, covering backend web development, cloud infrastructure, database architecture, real-time data pipelines, AI/ML integration, and automated deployment.
 
 ### Core Problem Solved
 Traditional algorithmic trading requires technical expertise to set up and run locally. Sentinel abstracts this entirely — users simply log in to a web dashboard, and their dedicated trading engine runs 24/7 on cloud infrastructure, executing trades automatically based on AI signals while they monitor everything in real time from any device.
@@ -294,13 +294,11 @@ Full threat model in [docs/06_security.md](docs/06_security.md).
 **Talha Ghaffar**
 GitHub: [@talha-ghaffar-ch](https://github.com/talha-ghaffar-ch)
 
-*Final-year project — University of Management and Technology, Lahore.*
-
 > ⚠️ **Disclaimer:** This project is for educational and portfolio purposes.
 > It is not financial advice, and automated trading carries substantial risk.
 
 ---
 
 <div align="center">
-<sub>© 2026 Talha Ghaffar — Proprietary, source-available. See <a href="LICENSE">LICENSE</a>.</sub>
+<sub>© 2026 Talha Ghaffar — Released under the <a href="LICENSE">MIT License</a>.</sub>
 </div>
