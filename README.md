@@ -2,6 +2,8 @@
 
 <div align="center">
 
+![Sentinel Cloud Trading Platform](docs/banner.png)
+
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -11,7 +13,7 @@
 
 **A cloud-hosted, AI-powered automated trading platform with multi-user management, real-time dashboards, and full AWS infrastructure.**
 
-[Overview](#system-overview) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Repository Layout](#repository-layout) · [Getting Started](#getting-started) · [Tech Stack](#tech-stack) · [Documentation](#documentation) · [Author](#author)
+[Overview](#system-overview) · [Architecture](#architecture) · [Repository Layout](#repository-layout) · [Getting Started](#getting-started) · [Tech Stack](#tech-stack) · [Documentation](#documentation) · [Author](#author)
 
 </div>
 
@@ -37,36 +39,6 @@ The system was designed and built end-to-end, covering backend web development, 
 
 ### Core Problem Solved
 Traditional algorithmic trading requires technical expertise to set up and run locally. Sentinel abstracts this entirely — users simply log in to a web dashboard, and their dedicated trading engine runs 24/7 on cloud infrastructure, executing trades automatically based on AI signals while they monitor everything in real time from any device.
-
----
-
-## Screenshots
-
-> Rendered directly from the application's templates. Figures shown are sample/demo data.
-
-### Live Trading Terminal
-Real-time terminal — AI signal, confidence, live P&L, drawdown monitor, risk controls, and system logs, all updating every second.
-
-![Trading terminal](docs/screenshots/terminal.png)
-
-**Automated risk & safety** — when drawdown breaches the configured limit, the circuit breaker halts trading, force-closes open positions, and locks the terminal until the operator reboots it:
-
-![Circuit breaker tripped](docs/screenshots/terminal-circuit-breaker.png)
-
-### Dashboard &nbsp;·&nbsp; Admin Panel
-| User Dashboard | Admin Panel |
-|:---:|:---:|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Admin panel](docs/screenshots/admin.png) |
-
-### Trade History &nbsp;·&nbsp; KYC Application
-| Trade History (RDS ledger) | Service Application |
-|:---:|:---:|
-| ![Trade history](docs/screenshots/history.png) | ![Application form](docs/screenshots/apply.png) |
-
-### Authentication
-| Login | Register |
-|:---:|:---:|
-| ![Login](docs/screenshots/login.png) | ![Register](docs/screenshots/register.png) |
 
 ---
 
